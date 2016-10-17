@@ -5,8 +5,13 @@ BSD License
 import numpy as np
 import sys
 
+export_boundry = [200, 50, 30, 10, 5, 2]
+exported = np.zeros_like(export_boundry)
+
+filename = sys.argv[1];
+
 # data I/O
-data = open(sys.argv[1], 'r').read() # should be simple plain text file
+data = open(filename, 'r').read() # should be simple plain text file
 if len(sys.argv) == 3:
   data = data.decode(sys.argv[2])
 chars = list(set(data))
@@ -81,6 +86,26 @@ def sample(h, seed_ix, n):
     ixes.append(ix)
   return ixes
 
+def save_model(boundry, char_to_ix, ix_to_char, Wxh, Whh, Why, bh, by, hprev):
+  import os
+  path = filename[0:filename.find(".")]+"_loss_"+str(boundry)
+  os.mkdir(path)
+
+  save_matrix(path, "char_to_ix", char_to_ix)
+  save_matrix(path, "ix_to_char", ix_to_char)
+  save_matrix(path, "Wxh", Wxh)
+  save_matrix(path, "Whh", Whh)
+  save_matrix(path, "Why", Why)
+  save_matrix(path, "bh", bh)
+  save_matrix(path, "by", by)
+  save_matrix(path, "hprev", hprev)
+
+def save_matrix(path, filename, data):
+  import pickle
+  outfile = open(path + "/" + filename, "w");
+  outfile.write(pickle.dumps(data, protocol=0))
+  outfile.close()
+
 n, p = 0, 0
 mWxh, mWhh, mWhy = np.zeros_like(Wxh), np.zeros_like(Whh), np.zeros_like(Why)
 mbh, mby = np.zeros_like(bh), np.zeros_like(by) # memory variables for Adagrad
@@ -103,6 +128,11 @@ while True:
   loss, dWxh, dWhh, dWhy, dbh, dby, hprev = lossFun(inputs, targets, hprev)
   smooth_loss = smooth_loss * 0.999 + loss * 0.001
   if n % 100 == 0: print 'iter %d, loss: %f' % (n, smooth_loss) # print progress
+
+  for index in range(len(export_boundry)):
+    if exported[index] == 0 and smooth_loss < export_boundry[index]:
+      save_model(smooth_loss, char_to_ix, ix_to_char, Wxh, Whh, Why, bh, by, hprev)
+      exported[index] = 1
   
   # perform parameter update with Adagrad
   for param, dparam, mem in zip([Wxh, Whh, Why, bh, by], 
