@@ -1,0 +1,5 @@
+# This is an implicit value, here for clarity
+--index-url https://pypi.python.org/simple/
+
+web = 0.38
+numpy = 1.8.0rc1
