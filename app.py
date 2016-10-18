@@ -9,7 +9,7 @@ app = web.application(urls, globals())
 
 class bella_chat:
     def __init__(self):
-        self.m = Model("bella_loss_9.99984147247/")
+        self.m = Model("bella_loss_4.99882774685/")
 
     def GET(self, first_char):
         return self.m.sample_char(first_char)
