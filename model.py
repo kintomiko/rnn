@@ -22,7 +22,7 @@ class Model:
 	def sample(self, h, seed_ix):
 		x = np.zeros((self.vocab_size, 1))
 		x[seed_ix] = 1
-		ixes = []
+		ixes = [seed_ix]
 		while True:
 			h = np.tanh(np.dot(self.Wxh, x) + np.dot(self.Whh, h) + self.bh)
 			y = np.dot(self.Why, h) + self.by
