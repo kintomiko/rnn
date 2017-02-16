@@ -1,0 +1,3 @@
+# rnn
+
+Simple RNN implementation
